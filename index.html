@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Грозный: как строился город. 2000–2026</title>
+<link rel="stylesheet" href="css/style.css?v=8">
+</head>
+<body>
+<div id="map"></div>
+<div id="haze"></div>
+<div id="vignette"></div>
+<div class="lb" id="lb-top"></div><div class="lb" id="lb-bot"></div>
+
+<header id="title">
+  <div class="kicker">Музей ЧГУ им. А. А. Кадырова</div>
+  <h1>Грозный</h1>
+  <div class="sub">Как строился город · 2000–2026</div>
+</header>
+
+<aside id="panel">
+  <div class="stats">
+    <div class="stat"><b id="st-built">0</b><span>построено с&nbsp;2000&nbsp;года</span></div>
+    <div class="stat"><b id="st-total">0</b><span>зданий на&nbsp;карте</span></div>
+    <div class="stat"><b id="st-pop">—</b><span id="st-pop-l">жителей</span></div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="year" class="on">Год</button>
+    <button data-tab="all">Объекты</button>
+    <button data-tab="chgu">ЧГУ</button>
+  </nav>
+  <div class="tabbody" id="tab-year"></div>
+  <div class="tabbody" id="tab-all" hidden></div>
+  <div class="tabbody" id="tab-chgu" hidden></div>
+</aside>
+
+<div id="card" hidden></div>
+
+<div id="stamp"><div id="stamp-y">2000</div><div id="stamp-n"></div><div id="stamp-h">Коснитесь экрана, чтобы управлять картой</div></div>
+
+<div id="caption"><div id="cap-y"></div><div id="cap-t"></div><div id="cap-x"></div></div>
+
+<div id="tools">
+  <button id="btn-tour" title="Автоматический показ главных строек по годам">▶ Кинопоказ</button>
+  <button id="btn-city" title="Показать весь город">Весь город</button>
+  <button id="btn-center" title="Центр города">Центр</button>
+  <button id="btn-chgu" title="Чеченский государственный университет">ЧГУ</button>
+  <button id="btn-3d" title="Переключить наклон камеры">2D</button>
+  <button id="btn-about" title="О данных">О данных</button>
+</div>
+
+<footer id="timeline">
+  <button id="play" aria-label="Запустить">
+    <svg viewBox="0 0 24 24" id="ico-play"><path d="M7 4.5v15l13-7.5z"/></svg>
+    <svg viewBox="0 0 24 24" id="ico-pause" hidden><path d="M6 4.5h4.5v15H6zM13.5 4.5H18v15h-4.5z"/></svg>
+  </button>
+  <div id="year">2000</div>
+  <div id="scrub">
+    <div id="bars"></div>
+    <div id="track"><div id="fill"></div><div id="thumb"></div></div>
+    <div id="ticks"></div>
+  </div>
+  <div id="legend">
+    <span><i class="sw sw-old"></i>застройка до 2000 года</span>
+    <span><i class="sw sw-new"></i>построено с 2000 года</span>
+    <span><i class="sw sw-hot"></i>новое в этом году</span>
+    <span><i class="sw sw-k"></i>строится</span>
+    <span><i class="sw sw-u"></i>корпуса ЧГУ</span>
+  </div>
+</footer>
+
+<div id="about" class="modal" hidden>
+  <div class="sheet">
+    <button class="close" id="about-close" aria-label="Закрыть">×</button>
+    <h2>О карте и данных</h2>
+    <p>Карта показывает здания Грозного, которые существуют сегодня, и год, когда каждое из них появилось. Ползунок внизу перемещает город во времени — от 2000 до 2026 года.</p>
+    <h3>Откуда взяты годы постройки</h3>
+    <ul>
+      <li><b>Точные даты</b> — знаковые объекты: мечети, высотные комплексы, стадионы, вузы, больницы. Даты открытия взяты из опубликованных источников.</li>
+      <li><b>Данные OpenStreetMap</b> — год постройки, указанный картографами-добровольцами.</li>
+      <li><b>Дата появления на карте</b> — если крупное здание появилось на карте OpenStreetMap там, где район уже был отрисован раньше, оно считается построенным незадолго до этого. Одинаковые дома одного жилого комплекса получают один год.</li>
+      <li><b>Оценка по спутниковым снимкам</b> — для остальной застройки год определён по тому, когда территория впервые стала застроенной на снимках Landsat и Sentinel (набор данных World Settlement Footprint Evolution, DLR). Точность — несколько лет.</li>
+    </ul>
+    <p>Дома, восстановленные или построенные заново на месте прежней застройки, спутниковая оценка относит к периоду до 2000 года: по снимкам такая территория считалась застроенной и раньше. Поэтому карта точнее всего показывает рост города на новых территориях и появление знаковых объектов.</p>
+    <h3>Источники</h3>
+    <p class="small">Контуры зданий, дороги, границы: © участники OpenStreetMap (лицензия ODbL), выгрузка Geofabrik. Спутниковые данные: World Settlement Footprint Evolution и WSF 2019, © DLR (CC BY 4.0). Население: Росстат, переписи 2002, 2010 и 2021 годов.</p>
+    <p class="small" id="about-stats"></p>
+  </div>
+</div>
+
+<div id="loading">Загрузка карты…</div>
+
+<script src="lib/deck.gl.min.js"></script>
+<script src="data/meta.js?v=6"></script>
+<script src="data/boundary.js?v=2"></script>
+<script src="data/areas.js?v=2"></script>
+<script src="data/roads.js?v=2"></script>
+<script src="data/buildings.js?v=6"></script>
+<script src="data/trees.js?v=3"></script>
+<script src="data/corrections.js"></script>
+<script src="js/app.js?v=28"></script>
+</body>
+</html>
